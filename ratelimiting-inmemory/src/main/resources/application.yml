@@ -1,0 +1,41 @@
+#server:
+#  port: 8080
+#spring:
+#  cloud:
+#    gateway:
+#      server:
+#        webflux:
+#          routes:
+#            - id: greet_svc
+#              uri: http://localhost:8080
+#              predicates:
+#                - Path=/api/**
+#              filters:
+#                - name: RequestRateLimiter
+#                  args:
+#                    key-resolver: "#{@userKeyResolver}"
+#                    rate-limiter: "#{@inMemoryRateLimiter}"
+#logging:
+#  level:
+#    org.springframework.cloud.gateway: TRACE
+#    org.springframework.cloud.gateway.filter.ratelimit: TRACE
+
+rate-limit:
+  capacity: 2              # Maximum tokens in bucket
+  refill-rate: 5           # Tokens added per second
+  cleanup-interval: PT5M   # Clean up old buckets every 5 minutes
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.skadu.learn.ratelimiting: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
