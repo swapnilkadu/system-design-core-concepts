@@ -4,8 +4,10 @@ import com.skadu.learn.ratelimiting.model.RateLimitProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -15,10 +17,18 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RateLimitConfiguration {
 
     @Bean
+    @Primary
+    public ReactiveStringRedisTemplate reactiveStringRedisTemplate(
+            ReactiveRedisConnectionFactory connectionFactory) {
+        return new ReactiveStringRedisTemplate(connectionFactory);
+    }
+
+    @Bean
     public ReactiveRedisTemplate<String, String> reactiveRedisTemplate(ReactiveRedisConnectionFactory connectionFactory) {
         RedisSerializer<String> serializer = new StringRedisSerializer();
+
         RedisSerializationContext<String, String> context = RedisSerializationContext
-                .<String, String>newSerializationContext()
+                .<String, String>newSerializationContext(serializer)
                 .key(serializer)
                 .value(serializer)
                 .build();
